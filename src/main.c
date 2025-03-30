@@ -6,6 +6,8 @@
 
 #include "../include/simulator.h"
 #include "../include/defines.h"
+#include "../include/list.h"
+#include "../include/process.h"
 
 
 // Global Data //
@@ -36,13 +38,52 @@ int main(int argc, char *argv[])
         {
         case BUILD_SIMULATOR:
             
-            Simulator* sim = simulator_create(argc, argv);
+            Simulator *sim = simulator_create(argc, argv);
 
             simulator_state = LOAD_PROCESSES;
             break;
         
         case LOAD_PROCESSES:
             
+            Process *process;
+
+            for(int i=0; i<5; i++)
+            {
+                process = (Process*) malloc(sizeof(Process));
+#ifdef DEBUG_ALOCATION
+                alocated_bytes += sizeof(Process);
+#endif
+                if(!process)
+                    exit(1);
+                process->pid = i;
+                process->arrival_time = 1+i;
+                process->total_instructions = 100+i;
+                process->instructions_remaining = 0.0;
+                process->instructions_remaining = 10-i;
+                process->state = 0;
+                sim->p_ready = list_add_end(sim->p_ready, process);
+            }
+
+            list_print(sim->p_ready);
+            list_print(sim->p_waiting);
+            printf("\n");
+
+            process = list_remove_fist(sim->p_ready);
+            sim->p_waiting = list_add_end(sim->p_waiting, process);
+            list_print(sim->p_ready);
+            list_print(sim->p_waiting);
+            printf("\n");
+
+            process = list_remove_fist(sim->p_ready);
+            sim->p_waiting = list_add_end(sim->p_waiting, process);
+            list_print(sim->p_ready);
+            list_print(sim->p_waiting);
+
+            printf("\n\n");
+            list_print_processes(sim->p_ready);
+            list_print_processes(sim->p_waiting);
+
+            // load_process_from_csv(p_loaded);
         
             simulator_state = EXIT;
             break;

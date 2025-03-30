@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/defines.h"
-#include "../include/scheduler.h"
-#include "../include/core.h"
+#include "defines.h"
+#include "scheduler.h"
+#include "core.h"
+#include "list.h"
 
 
 typedef struct {
@@ -16,8 +17,8 @@ typedef struct {
     int n_cores;
     float quantum;
     Core *cores;
-    // Queue *p_pronto;
-    // Queue *p_espera;
+    List *p_ready;
+    List *p_waiting;
 } Simulator;
 
 Simulator* simulator_create(int argc, char *argv[]);

@@ -20,7 +20,7 @@ Simulator* simulator_create(int argc, char *argv[])
         exit(1);
     }
 
-    Simulator* sim = malloc(sizeof(Simulator));
+    Simulator* sim = (Simulator*) malloc(sizeof(Simulator));
     if(!sim)
     {
         printf("simulator malloc returned NULL!!!\n");
@@ -35,6 +35,8 @@ Simulator* simulator_create(int argc, char *argv[])
     int idx_cores = 2;
     int n_cores = 1;
     Core *cores;
+    List *p_ready;
+    List *p_waiting;
 
     // Get the scheduling_algorithm
     if (!strcmp(argv[1], "FCFS"))
@@ -58,7 +60,7 @@ Simulator* simulator_create(int argc, char *argv[])
     }
     
     // Get cores
-    cores = malloc(n_cores * sizeof(Core));
+    cores = (Core*) malloc(n_cores * sizeof(Core));
     if(!cores)
     {
         printf("cores malloc returned NULL!!!\n");
@@ -82,6 +84,8 @@ Simulator* simulator_create(int argc, char *argv[])
     sim->n_cores = n_cores;
     sim->cores = cores;
     sim->time = 0;
+    sim->p_ready = list_create();
+    sim->p_waiting = list_create();
 
     return(sim);
 }
@@ -93,7 +97,11 @@ void simulator_destroy(Simulator *sim)
     dealocated_bytes += sim->n_cores * sizeof(Core);
 #endif
 
-    // free listas
+    if(sim->p_ready)
+        list_destroy(sim->p_ready);
+    
+    if(sim->p_waiting)
+        list_destroy(sim->p_waiting);
 
     free(sim);
 #ifdef DEBUG_ALOCATION
