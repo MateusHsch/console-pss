@@ -14,7 +14,7 @@ List *list_create()
     List *list = (List *)malloc(sizeof(List));
     if (!list)
     {
-        printf("List malloc returned NULL!!!\n");
+        perror("List malloc returned NULL!!!\n");
         exit(1);
     }
 #ifdef DEBUG_ALOCATION
@@ -61,7 +61,7 @@ List *list_add_end(List *list, Process *process)
     Node *this = (Node *)malloc(sizeof(Node));
     if (!this)
     {
-        printf("Node malloc returned NULL!!!\n");
+        perror("Node malloc returned NULL!!!\n");
         exit(1);
     }
 #ifdef DEBUG_ALOCATION
@@ -142,7 +142,7 @@ void list_print_processes(List *list)
         printf("|\n");
         while(this)
         {
-            printf("{%p} -> %p: {pid: %d, arrival_time: %d, total_instructions: %d, io_rate: %.2f, instructions_remaining: %d, state: %d}\n"
+            printf("{%p} -> %p: {pid: %d, arrival_time: %d, total_inst: %d, io_rate: %.2f, inst_remaining: %d, state: %d}\n"
                     ,this
                     ,this->process
                     ,this->process->pid

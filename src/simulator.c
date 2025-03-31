@@ -23,7 +23,7 @@ Simulator* simulator_create(int argc, char *argv[])
     Simulator* sim = (Simulator*) malloc(sizeof(Simulator));
     if(!sim)
     {
-        printf("simulator malloc returned NULL!!!\n");
+        perror("simulator malloc returned NULL!!!\n");
         exit(1);
     }
 #ifdef DEBUG_ALOCATION
@@ -63,7 +63,7 @@ Simulator* simulator_create(int argc, char *argv[])
     cores = (Core*) malloc(n_cores * sizeof(Core));
     if(!cores)
     {
-        printf("cores malloc returned NULL!!!\n");
+        perror("cores malloc returned NULL!!!\n");
         exit(1);
     }
 #ifdef DEBUG_ALOCATION

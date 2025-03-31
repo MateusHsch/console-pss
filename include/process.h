@@ -11,4 +11,12 @@ typedef struct {
     // other metrics you want to track
 } Process;
 
+enum Process_States{
+    LOADED = 0,
+    READY,
+    RUNING,
+    WAITING,
+    TERMINATED,
+};
+
 #endif

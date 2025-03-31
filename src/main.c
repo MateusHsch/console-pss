@@ -6,8 +6,9 @@
 
 #include "../include/simulator.h"
 #include "../include/defines.h"
-#include "../include/list.h"
 #include "../include/process.h"
+#include "../include/list.h"
+#include "../include/csv_parser.h"
 
 
 // Global Data //
@@ -16,13 +17,6 @@
 int alocated_bytes = 0;
 int dealocated_bytes = 0;
 #endif
-
-enum Simulator_States{
-    BUILD_SIMULATOR = 1,
-    LOAD_PROCESSES,
-    SCHEDULE,
-    EXIT,
-};
 
 
 // Main Program
@@ -45,52 +39,23 @@ int main(int argc, char *argv[])
         
         case LOAD_PROCESSES:
             
-            Process *process;
+            List *p_loaded = list_create();
 
-            for(int i=0; i<5; i++)
-            {
-                process = (Process*) malloc(sizeof(Process));
-#ifdef DEBUG_ALOCATION
-                alocated_bytes += sizeof(Process);
-#endif
-                if(!process)
-                    exit(1);
-                process->pid = i;
-                process->arrival_time = 1+i;
-                process->total_instructions = 100+i;
-                process->instructions_remaining = 0.0;
-                process->instructions_remaining = 10-i;
-                process->state = 0;
-                sim->p_ready = list_add_end(sim->p_ready, process);
-            }
+            p_loaded = load_process_from_csv(p_loaded, argv[argc-1]);
+            
+            simulator_state = SCHEDULE;
+            break;
 
-            list_print(sim->p_ready);
-            list_print(sim->p_waiting);
-            printf("\n");
+        case SCHEDULE:
 
-            process = list_remove_fist(sim->p_ready);
-            sim->p_waiting = list_add_end(sim->p_waiting, process);
-            list_print(sim->p_ready);
-            list_print(sim->p_waiting);
-            printf("\n");
-
-            process = list_remove_fist(sim->p_ready);
-            sim->p_waiting = list_add_end(sim->p_waiting, process);
-            list_print(sim->p_ready);
-            list_print(sim->p_waiting);
-
-            printf("\n\n");
-            list_print_processes(sim->p_ready);
-            list_print_processes(sim->p_waiting);
-
-            // load_process_from_csv(p_loaded);
-        
             simulator_state = EXIT;
             break;
 
         // EXIT
         default:
             
+            list_destroy(p_loaded);
+
             simulator_destroy(sim);
 
 #ifdef DEBUG_ALOCATION
@@ -99,7 +64,6 @@ int main(int argc, char *argv[])
             printf("bytes dealocated: %d\n", dealocated_bytes);
             printf("==============================\n");
 #endif
-
             return 0;
         }
     }

@@ -24,4 +24,12 @@ typedef struct {
 Simulator* simulator_create(int argc, char *argv[]);
 void simulator_destroy(Simulator *sim);
 
+
+enum Simulator_States{
+    BUILD_SIMULATOR = 1,
+    LOAD_PROCESSES,
+    SCHEDULE,
+    EXIT,
+};
+
 #endif
