@@ -9,5 +9,6 @@
 #include "defines.h"
 
 List* load_process_from_csv(List *list, char* path);
+void parser_free_process(Process *process);
 
 #endif

@@ -29,6 +29,9 @@ Simulator* simulator_create(int argc, char *argv[])
 #ifdef DEBUG_ALOCATION
     alocated_bytes += sizeof(Simulator);
 #endif
+#ifdef LOG_ADRESS_ALOCATION   
+    printf("malloc of Simulator: {%p}\n", sim);
+#endif
 
     int scheduling_algorithm = FCFS;
     float quantum = 1.0;
@@ -69,6 +72,9 @@ Simulator* simulator_create(int argc, char *argv[])
 #ifdef DEBUG_ALOCATION
     alocated_bytes += n_cores * sizeof(Core);
 #endif
+#ifdef LOG_ADRESS_ALOCATION   
+    printf("malloc of Cores: {%p}\n", cores);
+#endif
 
     for(int i=0; i<n_cores; i++)
     {
@@ -86,12 +92,30 @@ Simulator* simulator_create(int argc, char *argv[])
     sim->time = 0;
     sim->p_ready = list_create();
     sim->p_waiting = list_create();
+    sim->p_terminated = list_create();
 
     return(sim);
 }
 
 void simulator_destroy(Simulator *sim)
 {
+    for(int i=0; i<sim->n_cores; i++)
+    {
+        if(sim->cores[i].current_process)
+        {
+#ifdef LOG_ADRESS_DEALOCATION   
+            printf("free of Process: {%p}\n", sim->cores[i].current_process);
+#endif
+            free(sim->cores[i].current_process);
+#ifdef DEBUG_ALOCATION
+            dealocated_bytes += sizeof(Process);
+#endif
+        }
+    }
+
+#ifdef LOG_ADRESS_DEALOCATION   
+    printf("free of Cores: {%p}\n", sim->cores);
+#endif
     free(sim->cores);
 #ifdef DEBUG_ALOCATION
     dealocated_bytes += sim->n_cores * sizeof(Core);
@@ -102,10 +126,25 @@ void simulator_destroy(Simulator *sim)
     
     if(sim->p_waiting)
         list_destroy(sim->p_waiting);
+    
+    if(sim->p_terminated)
+        list_destroy(sim->p_terminated);
 
+
+#ifdef LOG_ADRESS_DEALOCATION   
+    printf("free of Simulator: {%p}\n", sim);
+#endif
     free(sim);
 #ifdef DEBUG_ALOCATION
     dealocated_bytes += sizeof(Simulator);
 #endif
 }
 
+void simulator_print(Simulator *sim)
+{
+    printf("=========< SIMULATOR >========\n");
+    printf("Scheduling algorithm: %d\n", sim->scheduling_algorithm);
+    printf("Quantum: %d\n", sim->quantum);
+    printf("Cores number: %d\n", sim->n_cores);
+    printf("==============================\n");
+}

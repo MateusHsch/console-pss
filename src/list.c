@@ -20,12 +20,15 @@ List *list_create()
 #ifdef DEBUG_ALOCATION
     alocated_bytes += sizeof(List);
 #endif
+#ifdef LOG_ADRESS_ALOCATION   
+        printf("malloc of List: {%p}\n", list);
+#endif
 
     list->size = 0;
     list->start = NULL;
     list->end = NULL;
 
-    return (list);
+    return list;
 }
 
 void list_destroy(List *list)
@@ -37,15 +40,32 @@ void list_destroy(List *list)
         while (this)
         {
             next = this->next;
-            free(this->process);
+            if(this->process)
+            {
+#ifdef LOG_ADRESS_DEALOCATION   
+                printf("free of Process: {%p}\n", this->process);
+#endif
+                free(this->process);
+#ifdef DEBUG_ALOCATION
+                dealocated_bytes += sizeof(Process);
+#endif
+            }
+            
+#ifdef LOG_ADRESS_DEALOCATION   
+            printf("free of Node: {%p}\n", this);
+#endif
             free(this);
 #ifdef DEBUG_ALOCATION
-            dealocated_bytes += sizeof(Process);
             dealocated_bytes += sizeof(Node);
 #endif
             this = next;
         }
 
+        list->size = 0;     
+
+#ifdef LOG_ADRESS_DEALOCATION   
+        printf("free of List: {%p}\n", list);
+#endif
         free(list);
 #ifdef DEBUG_ALOCATION
         dealocated_bytes += sizeof(List);
@@ -67,29 +87,27 @@ List *list_add_end(List *list, Process *process)
 #ifdef DEBUG_ALOCATION
     alocated_bytes += sizeof(Node);
 #endif
+#ifdef LOG_ADRESS_ALOCATION   
+        printf("malloc of Node: {%p}\n", this);
+#endif
 
     this->process = process;
     list->size++;
 
-    if (list->end)
-    {
-        list->end->next = this;
-        this->prev = list->end;
-        this->next = NULL;
-        list->end = this;
-    }
-    else
-    {
-        list->start = this;
-        list->end = this;
-        this->prev = NULL;
-        this->next = NULL;
-    }
+    this->prev = list->end;
+    this->next = NULL;
 
-    return (list);
+    if (list->end)
+        list->end->next = this;
+    else
+        list->start = this;
+
+    list->end = this;
+
+    return list;
 }
 
-Process *list_remove_fist(List *list)
+Process *list_remove_first(List *list)
 {
     if (!list)
         return NULL;
@@ -105,13 +123,74 @@ Process *list_remove_fist(List *list)
 
     if (list->start)
         list->start->prev = NULL;
+    else
+        list->end = NULL;
 
+#ifdef LOG_ADRESS_DEALOCATION   
+    printf("free of Node: {%p}\n", this);
+#endif
     free(this);
 #ifdef DEBUG_ALOCATION
     dealocated_bytes += sizeof(Node);
 #endif
 
-    return (process);
+    return process;
+}
+
+Process *list_remove_by_process(List *list, Process *process)
+{
+    if (!list)
+        return NULL;
+
+    if (!list->start)
+        return NULL;
+
+    Node *this = list->start;
+
+    while (this)
+    {
+        if(this->process == process)
+            break;
+        else
+            this = this->next;
+    }
+
+    if(!this)
+        return NULL;
+    
+    if (this == list->start)
+    {
+        list->start = this->next;
+        if(list->start)
+            list->start->prev = NULL;
+        else
+            list->end = NULL;
+    }
+    else if (this == list->end)
+    {
+        list->end = this->prev;
+        if(list->end)
+            list->end->next = NULL;
+        else
+            list->start = NULL;
+    }
+    else
+    {
+        this->next->prev = this->prev;
+        this->prev->next = this->next;
+    }
+
+    list->size--;
+    
+#ifdef LOG_ADRESS_DEALOCATION   
+    printf("free of Node: {%p}\n", this);
+#endif
+    free(this);
+#ifdef DEBUG_ALOCATION
+    dealocated_bytes += sizeof(Node);
+#endif
+
+    return process;
 }
 
 void list_print(List *list)
@@ -138,19 +217,12 @@ void list_print_processes(List *list)
     if (list)
     {
         Node *this = list->start;
+        printf("List size: %d\n", list->size);
         printf("start\n");
         printf("|\n");
         while(this)
         {
-            printf("{%p} -> %p: {pid: %d, arrival_time: %d, total_inst: %d, io_rate: %.2f, inst_remaining: %d, state: %d}\n"
-                    ,this
-                    ,this->process
-                    ,this->process->pid
-                    ,this->process->arrival_time
-                    ,this->process->total_instructions
-                    ,this->process->io_rate
-                    ,this->process->instructions_remaining
-                    ,this->process->state);
+            process_print(this->process);
             printf("|\n");
             this = this->next;
         }

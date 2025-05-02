@@ -25,7 +25,7 @@ List* load_process_from_csv(List *list, char* path)
     Process *process;
     char *token;
 
-    printf("==============================\n");
+    printf("\n========< CSV_PARSER >========\n");
     printf("Loading processes from:\n%s\n", path);
     printf("==============================\n");
 
@@ -46,13 +46,16 @@ List* load_process_from_csv(List *list, char* path)
 #ifdef DEBUG_ALOCATION
         alocated_bytes += sizeof(Process);
 #endif
+#ifdef LOG_ADRESS_ALOCATION   
+        printf("malloc of Process: {%p}\n", process);
+#endif
         // Get process PID
         token = strtok(line, ",");
         if(!token)
         {
             printf("line %d: Could not acquire process pid...\n", line_idx);
             fail_counter++;
-            free(process);
+            parser_free_process(process);
             continue;
         }
         process->pid = atoi(token);
@@ -63,7 +66,7 @@ List* load_process_from_csv(List *list, char* path)
         {
             printf("line %d: Could not acquire process arrival time...\n", line_idx);
             fail_counter++;
-            free(process);
+            parser_free_process(process);
             continue;
         }
         process->arrival_time = atoi(token);
@@ -74,7 +77,7 @@ List* load_process_from_csv(List *list, char* path)
         {
             printf("line %d: Could not acquire process total instructions...\n", line_idx);
             fail_counter++;
-            free(process);
+            parser_free_process(process);
             continue;
         }
         process->total_instructions = atoi(token);
@@ -85,12 +88,14 @@ List* load_process_from_csv(List *list, char* path)
         {
             printf("line %d: Could not acquire process io rate...\n", line_idx);
             fail_counter++;
-            free(process);
+            parser_free_process(process);
             continue;
         }
         process->io_rate = atof(token);
 
+        process->burst_time = 0;
         process->instructions_remaining = process->total_instructions;
+        process->io_end_time = 0;
         process->state = LOADED;
 
         printf("line %d -> PID: %d, Arrival time: %d, Total intructions: %d, IO rate: %.2f\n"
@@ -110,4 +115,15 @@ List* load_process_from_csv(List *list, char* path)
 
     fclose(file);
     return(list);
+}
+
+void parser_free_process(Process *process)
+{
+#ifdef LOG_ADRESS_DEALOCATION   
+    printf("free of Process: {%p}\n", process);
+#endif
+    free(process);
+#ifdef DEBUG_ALOCATION
+    dealocated_bytes += sizeof(Process);
+#endif
 }

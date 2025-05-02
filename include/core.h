@@ -3,7 +3,7 @@
 
 #include "process.h"
 
-typedef struct {
+typedef struct core{
     int id;
     int mips;       // speed in millions of instructions per second
     Process *current_process;

@@ -23,7 +23,8 @@ typedef struct list{
 List* list_create();
 void list_destroy(List *list);
 List* list_add_end(List *list, Process *process);
-Process* list_remove_fist(List *list);
+Process* list_remove_first(List *list);
+Process* list_remove_by_process(List *list, Process *process);
 void list_print(List *list);
 void list_print_processes(List *list);
 

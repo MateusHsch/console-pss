@@ -1,6 +1,15 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define TRUE 1
+#define FALSE 0
+
+//#define LOG_ADRESS_ALOCATION
+//#define LOG_ADRESS_DEALOCATION
+#define LOG_EXECUTE_CORES
+
 #define DEBUG_ALOCATION
+#define DEBUG_PRINT_PROCESSES_LISTS
+#define DEBUG_PRINT_CORES
 
 #endif
