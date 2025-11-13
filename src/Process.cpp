@@ -9,23 +9,47 @@ Process::Process(int pid, const std::string& name, int arrival_time, int total_i
     , remaining_instructions(total_instructions)
     , io_rate(io_rate)
     , io_timer(0)
+    , completion_time(-1)
+    , first_run_time(-1)
     , cpu_bursts_count(0)
     , io_bursts_count(0)
 {};
 
 void Process::run(int instructions)
 {
-    //Method implementation
+    cpu_bursts_count++;
+
+    remaining_instructions -= instructions;
+    if (remaining_instructions < 0) { remaining_instructions = 0; }
+}
+
+bool Process::check_io(float rand)
+{
+    if(rand <= io_rate)
+    {
+        //TODO: Maybe change to a random number of cycles
+        block(5);
+        state = ProcessState::WAITING;
+
+        return true;
+    }
+
+    return false;
 }
 
 void Process::block(int duration)
 {
-    //Method implementation
+    io_timer = duration;
 }
 
-void Process::wait()
+bool Process::wait()
 {
-    //Method implementation
+    io_bursts_count++;
+
+    if(--io_timer <= 0)
+        return true;
+    else
+        return false;
 }
 
 void Process::print_info() const
@@ -41,4 +65,22 @@ void Process::print_info() const
                 << "CPU Bursts Count: " << cpu_bursts_count << "\n"
                 << "I/O Bursts Count: " << io_bursts_count << "\n"
                 << "=================\n";
+}
+
+void Process::print_result() const
+{
+    int turnaround_time = completion_time - arrival_time;
+    int waiting_time = turnaround_time - cpu_bursts_count;
+    int response_time = first_run_time - arrival_time;
+
+    std::cout   << std::left
+                << std::setw(6) << pid
+                << std::setw(18) << name
+                << std::setw(10) << arrival_time
+                << std::setw(16) << completion_time
+                << std::setw(16) << cpu_bursts_count
+                << std::setw(18) << turnaround_time
+                << std::setw(16) << waiting_time
+                << std::setw(16) << response_time
+                << std::endl;
 }

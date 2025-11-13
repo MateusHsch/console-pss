@@ -1,3 +1,0 @@
-/home/mateushsch/Documentos/workingon/process-scheduler-simulator/build/CMakeFiles/process_scheduler_simulator.dir
-/home/mateushsch/Documentos/workingon/process-scheduler-simulator/build/CMakeFiles/edit_cache.dir
-/home/mateushsch/Documentos/workingon/process-scheduler-simulator/build/CMakeFiles/rebuild_cache.dir
